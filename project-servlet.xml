@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/mvc
+		http://www.springframework.org/schema/mvc/spring-mvc.xsd"
+       >
+            
+<!-- Enable transaction annotations like @Transactional -->
+
+    
+<tx:annotation-driven transaction-manager="transactionManager"/>
+
+<context:annotation-config></context:annotation-config>
+<context:component-scan base-package="com.jsp.projectWork"></context:component-scan>
+<context:component-scan base-package="ProjectDao"></context:component-scan>
+
+<mvc:resources mapping="/resources/**" location="/resources/" />
+
+<mvc:annotation-driven />
+	
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+     name="viewResolver">
+    <!-- The folder where your view files are securely stored -->
+    <property name="prefix" value="/WEB-INF/views/" />
+ 
+    <!-- The file extension of your view files -->
+    <property name="suffix" value=".jsp" />
+</bean>
+
+<!-- 1. Database Connection -->
+
+<bean id="ds" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <!-- PostgreSQL Driver -->
+    <property name="driverClassName" value="org.postgresql.Driver" />
+    
+    <!-- Connection URL -->
+    <property name="url" value="jdbc:postgresql://localhost:5432/mvcproject" />
+    
+    <!-- Credentials -->
+    <property name="username" value="postgres" />
+    <property name="password" value="root" />
+</bean>
+
+
+
+<!-- 2. Hibernate Session Factory Configuration -->
+
+<bean class="org.springframework.orm.hibernate5.LocalSessionFactoryBean" name="factory">
+
+    <!-- data source -->
+    <property name="dataSource" ref="ds"></property>
+
+    <!-- hibernate properties -->
+    <property name="hibernateProperties">
+        <props>
+            <prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</prop>
+            <prop key="hibernate.show_sql">true</prop>
+            <prop key="hibernate.hbm2ddl.auto">update</prop>
+        </props>
+    </property>
+
+    <!-- annotated classes -->
+    <property name="annotatedClasses">
+        <list>
+          <value>ProductModel.Product</value>
+        </list>
+    </property>
+
+</bean>
+
+<bean class="org.springframework.orm.hibernate5.HibernateTemplate"
+      name="hibernateTemplate">
+    <property name="sessionFactory" ref="factory"/>
+</bean>
+
+<bean class="org.springframework.orm.hibernate5.HibernateTransactionManager"
+      name="transactionManager">
+    <property name="sessionFactory" ref="factory"/>
+</bean>
+
+
+
+
+
+</beans>
